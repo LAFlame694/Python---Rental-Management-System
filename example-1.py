@@ -124,25 +124,7 @@ class Window2:
 
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
-    def key_pressed(self, event):
-        focused_widget = self.master.focus_get()
-        
-        # If the focused widget is an Entry but not the calculator display, ignore keypress
-        if isinstance(focused_widget, Entry) and focused_widget != self.txtDisplay:
-            return
 
-        key = event.char
-        if key in '0123456789+-*/':
-            self.clickbutton(key)
-        elif key == '\r':  # Enter
-            self.equals()
-        elif key.lower() == 'c':
-            self.clearvalue()
-        elif event.keysym == 'BackSpace':
-            self.operator = self.operator[:-1]
-            self.value.set(self.operator)
-            self.txtDisplay.delete(0, END)
-            self.txtDisplay.insert(END, self.operator)
 
     def clear_entries(self, *entries):
         for entry in entries:
@@ -227,9 +209,8 @@ class Window2:
     def __init__(self, master):
 
         self.master = master
-        self.master.bind("<Key>", self.key_pressed)
         self.master.title("Welcome to Gashoka Apartment")
-        self.master.geometry("1500x1000+0+0")
+        self.master.geometry("1500x700+0+0")
 
         self.operator = ""
         self.value = StringVar()
@@ -307,7 +288,7 @@ class Window2:
         self.bottom_frame.pack(side=TOP, fill=BOTH, expand=True)
 
         #=== Calculator Frame ===================================================================================================
-        self.calculator_frame = Frame(self.frame, bd=5, relief=GROOVE, bg="cyan")
+        self.calculator_frame = Frame(self.frame, bd=5, relief=GROOVE)
         self.calculator_frame.pack(side=RIGHT, fill=Y)
 
         #=== monthly summery frame ===================================================================================================
@@ -335,23 +316,9 @@ class Window2:
         Label(self.monthly_summery_frame, textvariable=self.grand_total_var, font=("Arial", 16, "bold"), fg="green").grid(row=3, column=1, sticky=W)
 
         #==== Bind mouse wheel to canvas scroll =================================================================================
-        """def _on_mousewheel(event):
-            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        self.canvas.bind_all("<MouseWheel>", _on_mousewheel)"""
-
         def _on_mousewheel(event):
-            self.canvas.yview_scroll(int(-1*(event.delta / 120)), "units")
-
-        def _bind_to_mousewheel(event):
-            self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
-
-        def _unbind_from_mousewheel(event):
-            self.canvas.unbind_all("<MouseWheel>")
-
-        # Bind/unbind when cursor enters or leaves the canvas
-        self.canvas.bind("<Enter>", _bind_to_mousewheel)
-        self.canvas.bind("<Leave>", _unbind_from_mousewheel)
-
+            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
         #=== Top_Labels ==============================================================================================================
         self.month_label = Label(self.month_year_frame, text="Select Month:", font=("Arial", 12, "bold"))
@@ -1204,13 +1171,13 @@ class Window2:
 
         for (text, row, col) in buttons:
             if text == "=":
-                Button(self.calculator_frame, text=text, padx=30, pady=5, bd=10,
+                Button(self.calculator_frame, text=text, padx=30, pady=5, bd=3,
                     font=('arial', 15, 'bold'), bg="green", command=self.equals).grid(row=row, column=col, sticky="nsew")
             elif text == "C":
-                Button(self.calculator_frame, text=text, padx=30, pady=5, bd=10,
+                Button(self.calculator_frame, text=text, padx=30, pady=5, bd=3,
                     font=('arial', 15, 'bold'), bg="red", command=self.clearvalue).grid(row=row, column=col, sticky="nsew")
             else:
-                Button(self.calculator_frame, text=text, padx=30, pady=5, bd=10,
+                Button(self.calculator_frame, text=text, padx=30, pady=5, bd=3,
                     font=('arial', 15, 'bold'), command=lambda txt=text: self.clickbutton(txt)).grid(row=row, column=col, sticky="nsew")
 
 
