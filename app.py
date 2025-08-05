@@ -5,10 +5,11 @@ from tkinter import messagebox
 import csv
 import os
 
+
 def main():
-    win = Tk()
-    app = LoginPage(win)
-    win.mainloop()
+    root = Tk()
+    LoginPage(root)
+    root.mainloop()
 
 class LoginPage:
 
@@ -60,9 +61,15 @@ class LoginPage:
                         self.progress_bar['value'] = i
                         self.progress_window.update_idletasks()
                         time.sleep(0.01)
+
                     self.progress_window.destroy()
-                    self.newwindow = Toplevel(self.win)
-                    self.app = Window2(self.newwindow)
+
+                    # remove all widgets from login window
+                    for widget in self.win.winfo_children():
+                        widget.destroy()    
+                    
+                    # initialize Window2
+                    Window2(self.win)
 
                 login_thread = threading.Thread(target=simulate_login_progress)
                 login_thread.start()
