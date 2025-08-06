@@ -5,6 +5,13 @@ from tkinter import messagebox
 import csv
 import os
 
+CREDENTIALS_FILE = "credentials.txt"
+
+# Create the file with default credentials if it doesn't exist
+if not os.path.exists(CREDENTIALS_FILE):
+    with open(CREDENTIALS_FILE, "w") as f:
+        f.write("admin,1234\n")
+
 
 def main():
     root = Tk()
@@ -12,6 +19,48 @@ def main():
     root.mainloop()
 
 class LoginPage:
+    def change_password_window(self):
+        self.pass_window = Toplevel(self.win)
+        self.pass_window.title("Change Password")
+        self.pass_window.geometry("300x250")
+        self.pass_window.configure(bg="cyan")
+
+        Label(self.pass_window, text="Current Username").pack(pady=5)
+        current_user = Entry(self.pass_window)
+        current_user.pack()
+
+        Label(self.pass_window, text="Current Password").pack(pady=5)
+        current_pass = Entry(self.pass_window, show="*")
+        current_pass.pack()
+
+        Label(self.pass_window, text="New Password").pack(pady=5)
+        new_pass = Entry(self.pass_window, show="*")
+        new_pass.pack()
+
+        Label(self.pass_window, text="Confirm New Password").pack(pady=5)
+        confirm_pass = Entry(self.pass_window, show="*")
+        confirm_pass.pack()
+
+        def update_password():
+            with open(CREDENTIALS_FILE, "r") as f:
+                credentials = f.readline().strip().split(",")
+
+            if current_user.get() != credentials[0] or current_pass.get() != credentials[1]:
+                messagebox.showerror("Error", "Incorrect current username or password.")
+                return
+
+            if new_pass.get() != confirm_pass.get():
+                messagebox.showerror("Error", "New passwords do not match.")
+                return
+
+            with open(CREDENTIALS_FILE, "w") as f:
+                f.write(f"{current_user.get()},{new_pass.get()}")
+
+            messagebox.showinfo("Success", "Password changed successfully.")
+            self.pass_window.destroy()
+
+        Button(self.pass_window, text="Update Password", bg="blue", fg="white", command=update_password).pack(pady=10)
+
 
     def __init__(self, win):
         self.win = win
@@ -47,7 +96,11 @@ class LoginPage:
 
         def check_login():
 
-            if username.get() == "flame" and password.get() == "1234":
+            with open(CREDENTIALS_FILE, "r") as f:
+                credentials = f.readline().strip().split(",")
+
+            if username.get() == credentials[0] and password.get() == credentials[1]:
+
                 self.progress_window = Toplevel(self.win)
                 self.progress_window.title("Logging In...")
                 self.progress_window.geometry("300x100")
@@ -81,13 +134,17 @@ class LoginPage:
             password.set("")
 
         self.button_frame=LabelFrame(self.entry_frame, text="Options", font=("Arial", 15), bg="lightgrey", bd=7, relief=GROOVE)
-        self.button_frame.place(x=20, y=188, width=500,height=100)
+        self.button_frame.place(x=20, y=188, width=700,height=100)
 
         self.login_btn=Button(self.button_frame, text="Login", font=("Arial", 15),bg="dodgerblue", bd= 5, width=15,command=check_login)
         self.login_btn.grid(row=0, column=0, padx=20, pady=2)
 
         self.reset_btn=Button(self.button_frame, text="Reset", font=("Arial", 15), bd =5, bg="red", width = 15,command=reset)
         self.reset_btn.grid(row=0, column=2, padx=20, pady=2)
+
+        self.change_pass_btn = Button(self.button_frame, text="Change Password", bd =5, font=("Arial", 15), bg="green", fg="white", command=self.change_password_window, width = 15)
+        self.change_pass_btn.grid(row=0, column=1, padx=20)
+
 
 class Window2:
 
