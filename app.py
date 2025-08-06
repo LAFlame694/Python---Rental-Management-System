@@ -22,24 +22,28 @@ class LoginPage:
     def change_password_window(self):
         self.pass_window = Toplevel(self.win)
         self.pass_window.title("Change Password")
-        self.pass_window.geometry("300x250")
-        self.pass_window.configure(bg="cyan")
+        self.pass_window.geometry("600x200")
+        self.pass_window.configure(bg="cyan4")
 
-        Label(self.pass_window, text="Current Username").pack(pady=5)
-        current_user = Entry(self.pass_window)
-        current_user.pack()
+        Label(self.pass_window, text="Username:", font=("verdana", 12, "bold italic"), bg="cyan4", fg="white").grid(row=0, column=0, sticky=W)
+        Label(self.pass_window, text=" ", bg="cyan4").grid(row=0, column=1)
+        current_user = Entry(self.pass_window, highlightthickness=10)
+        current_user.grid(row=0, column=2)
 
-        Label(self.pass_window, text="Current Password").pack(pady=5)
-        current_pass = Entry(self.pass_window, show="*")
-        current_pass.pack()
+        Label(self.pass_window, text="Current Password:", font=("verdana", 12, "bold italic"), bg="cyan4", fg="white").grid(row=1, column=0, sticky=W)
+        Label(self.pass_window, text=" ", bg="cyan4").grid(row=1, column=1)
+        current_pass = Entry(self.pass_window, show="*", highlightthickness=10)
+        current_pass.grid(row=1, column=2)
 
-        Label(self.pass_window, text="New Password").pack(pady=5)
-        new_pass = Entry(self.pass_window, show="*")
-        new_pass.pack()
+        Label(self.pass_window, text="New Password:", font=("verdana", 12, "bold italic"), bg="cyan4", fg="white").grid(row=2, column=0, sticky=W)
+        Label(self.pass_window, text=" ", bg="cyan4").grid(row=2, column=1)
+        new_pass = Entry(self.pass_window, show="*", highlightthickness=10)
+        new_pass.grid(row=2, column=2)
 
-        Label(self.pass_window, text="Confirm New Password").pack(pady=5)
-        confirm_pass = Entry(self.pass_window, show="*")
-        confirm_pass.pack()
+        Label(self.pass_window, text="Confirm New Password:", font=("verdana", 12, "bold italic"), bg="cyan4", fg="white").grid(row=3, column=0, sticky=W)
+        Label(self.pass_window, text=" ", bg="cyan4").grid(row=3, column=1)
+        confirm_pass = Entry(self.pass_window, show="*", highlightthickness=10)
+        confirm_pass.grid(row=3, column=2)
 
         def update_password():
             with open(CREDENTIALS_FILE, "r") as f:
@@ -59,7 +63,7 @@ class LoginPage:
             messagebox.showinfo("Success", "Password changed successfully.")
             self.pass_window.destroy()
 
-        Button(self.pass_window, text="Update Password", bg="blue", fg="white", command=update_password).pack(pady=10)
+        Button(self.pass_window, text="Update Password", font=("Arial", 12, "bold"), bg="dodgerblue", fg="white", bd= 5, width=15, command=update_password).grid(row=4, column=1)
 
 
     def __init__(self, win):
@@ -145,6 +149,10 @@ class LoginPage:
         self.change_pass_btn = Button(self.button_frame, text="Change Password", bd =5, font=("Arial", 15), bg="green", fg="white", command=self.change_password_window, width = 15)
         self.change_pass_btn.grid(row=0, column=1, padx=20)
 
+SAVED_RECORDS_DIR = "Saved Records"
+if not os.path.exists(SAVED_RECORDS_DIR):
+    os.makedirs(SAVED_RECORDS_DIR)
+
 
 class Window2:
 
@@ -157,7 +165,7 @@ class Window2:
             messagebox.showwarning("Missing Date", "Please select both Month and Year.")
             return
 
-        filename = f"{month}_{year}.csv"
+        filename = os.path.join(SAVED_RECORDS_DIR, f"{month}_{year}.csv")
         if not os.path.exists(filename):
             messagebox.showerror("File Not Found", f"No data found for {month} {year}.")
             return
@@ -188,6 +196,7 @@ class Window2:
 
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
     def key_pressed(self, event):
         focused_widget = self.master.focus_get()
         
@@ -240,7 +249,13 @@ class Window2:
             messagebox.showwarning("Missing Date", "Please select both Month and Year.")
             return
 
-        filename = f"{month}_{year}.csv"
+        # Check for empty fields
+        entries = [paid_entry, rent_entry, water_entry, garbage_entry, balance_entry, total_entry]
+        if any(not entry.get().strip() for entry in entries):
+            messagebox.showwarning("Missing Data", "Please fill in all fields before saving.")
+            return
+
+        filename = os.path.join(SAVED_RECORDS_DIR, f"{month}_{year}.csv")
 
         # Create file if not exists and add header
         file_exists = os.path.isfile(filename)
